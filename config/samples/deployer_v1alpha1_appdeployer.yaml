@@ -1,0 +1,8 @@
+apiVersion: deployer.radisys.com/v1alpha1
+kind: AppDeployer
+metadata:
+  name: appdeployer-sample
+spec:
+  imageName: "nginx:latest"
+  createService: true
+  port: 80

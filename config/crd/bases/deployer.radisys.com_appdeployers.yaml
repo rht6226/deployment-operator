@@ -1,0 +1,60 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.0
+  creationTimestamp: null
+  name: appdeployers.deployer.radisys.com
+spec:
+  group: deployer.radisys.com
+  names:
+    kind: AppDeployer
+    listKind: AppDeployerList
+    plural: appdeployers
+    shortNames:
+    - depl
+    - deployers
+    singular: appdeployer
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: AppDeployer is the Schema for the appdeployers API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: AppDeployerSpec defines the desired state of AppDeployer
+            properties:
+              createService:
+                type: boolean
+              imageName:
+                type: string
+              port:
+                format: int32
+                type: integer
+            required:
+            - createService
+            - imageName
+            - port
+            type: object
+          status:
+            description: AppDeployerStatus defines the observed state of AppDeployer
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

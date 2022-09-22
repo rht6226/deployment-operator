@@ -1,0 +1,20 @@
+# permissions for end users to view appdeployers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: appdeployer-viewer-role
+rules:
+- apiGroups:
+  - deployer.radisys.com
+  resources:
+  - appdeployers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - deployer.radisys.com
+  resources:
+  - appdeployers/status
+  verbs:
+  - get
