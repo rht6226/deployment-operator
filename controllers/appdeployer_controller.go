@@ -102,9 +102,9 @@ func (r *AppDeployerReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		// Here we can write code for updating the deployment if any change in spec occurs
 		logger.Info("Deployment Already exists:" + fmt.Sprintf("%s-deployment", cr.Name))
 
-		if !reflect.DeepEqual(r.getDeploymentSpecFromExisting(deployment), r.getDeployment(cr).Spec) {
+		if depSpec := r.getDeployment(cr).Spec; !reflect.DeepEqual(r.getDeploymentSpecFromExisting(deployment), &depSpec) {
 			logger.Info("Updating Deployment...")
-			deployment.Spec = r.getDeployment(cr).Spec
+			deployment.Spec = depSpec
 			err = r.Update(ctx, deployment)
 			if err != nil {
 				return ctrl.Result{}, err
@@ -142,7 +142,7 @@ func (r *AppDeployerReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 			// Here we can write the code to update the service if any change in spec occurs
 			logger.Info("Service already exists: " + fmt.Sprintf("%s-service", cr.Name))
 
-			if svcSpec := r.getService(cr).Spec; !reflect.DeepEqual(r.getServiceSpecFromExisting(service), svcSpec) {
+			if svcSpec := r.getService(cr).Spec; !reflect.DeepEqual(r.getServiceSpecFromExisting(service), &svcSpec) {
 				logger.Info("Updating service...")
 				service.Spec = svcSpec
 				err = r.Update(ctx, service)
@@ -203,7 +203,7 @@ func (r *AppDeployerReconciler) getDeploymentSpecFromExisting(existing *appsv1.D
 
 	return &appsv1.DeploymentSpec{
 		Selector: &metav1.LabelSelector{
-			MatchLabels: existing.Labels,
+			MatchLabels: existing.Spec.Selector.MatchLabels,
 		},
 		Template: corev1.PodTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
@@ -258,7 +258,13 @@ func (r *AppDeployerReconciler) getServiceSpecFromExisting(existing *corev1.Serv
 	return &corev1.ServiceSpec{
 		Type:     existing.Spec.Type,
 		Selector: existing.Spec.Selector,
-		Ports:    existing.Spec.Ports,
+		Ports: []corev1.ServicePort{
+			{
+				Protocol:   existing.Spec.Ports[0].Protocol,
+				Port:       existing.Spec.Ports[0].Port,
+				TargetPort: intstr.IntOrString{IntVal: existing.Spec.Ports[0].Port},
+			},
+		},
 	}
 }
 
